@@ -11,6 +11,8 @@ df <- causaldata::Mroz %>%
   filter(lfp == TRUE) %>% 
   mutate(earn = exp(lwg))
 
+#scatter plot of inc by earn
+
 ggplot(df, aes(inc, y=earn)) +
   geom_point() +
   scale_x_log10() + scale_y_log10()
@@ -27,4 +29,22 @@ df %>%
   group_by(inc_cut) %>% 
   summarise(earn = mean(earn))
 
-## draw de LOESS and linear regression curves
+## draw the LOESS 
+ggplot(df, aes(inc, earn)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_x_log10() + scale_y_log10()
+
+## plot linear regression
+ggplot(df, aes(inc, earn)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE) +
+  scale_x_log10() + scale_y_log10()
+
+## run a linear regression, by itself and including controls
+model1 <- lm(formula = lwg ~ log(inc), data = df)
+
+#k5 is number of kids under 5
+model2 <- lm(lwg ~ log(inc) + wc + k5, data = df)
+
+msummary(list(model1, model2))
